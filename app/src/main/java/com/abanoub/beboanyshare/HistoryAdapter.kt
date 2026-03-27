@@ -1,11 +1,11 @@
-package com.swiftshare
+package com.abanoub.beboanyshare
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.swiftshare.databinding.ItemHistoryBinding
+import com.abanoub.beboanyshare.databinding.ItemHistoryBinding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale

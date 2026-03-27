@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace = "com.swiftshare"
+    namespace = "com.abanoub.beboanyshare"
     compileSdk = 34
 
     defaultConfig {
@@ -41,7 +41,7 @@ android {
 dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
+    implementation("com.google.android.material:material:1.12.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
@@ -51,9 +51,19 @@ dependencies {
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
-    // QR Code and NanoHTTPD
+    // QR Code, Scanning, and NanoHTTPD
     implementation("com.google.zxing:core:3.5.3")
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
     implementation("org.nanohttpd:nanohttpd:2.3.1")
+
+    // Nearby Connections
+    implementation("com.google.android.gms:play-services-nearby:19.1.0")
+
+    // Lottie animations
+    implementation("com.airbnb.android:lottie:6.4.0")
+
+    // Glide for app icons
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")

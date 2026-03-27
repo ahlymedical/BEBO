@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_transfer"
-        android:name="com.swiftshare.TransferFragment"
+        android:name="com.abanoub.beboanyshare.TransferFragment"
         android:label="@string/title_transfer"
         tools:layout="@layout/fragment_transfer" />
 
     <fragment
         android:id="@+id/navigation_history"
-        android:name="com.swiftshare.HistoryFragment"
+        android:name="com.abanoub.beboanyshare.HistoryFragment"
         android:label="@string/title_history"
         tools:layout="@layout/fragment_history" />
 
     <fragment
         android:id="@+id/navigation_settings"
-        android:name="com.swiftshare.SettingsFragment"
+        android:name="com.abanoub.beboanyshare.SettingsFragment"
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_settings" />
 </navigation>

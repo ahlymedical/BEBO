@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    tools:context=".SenderActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="@color/colorDark"
+            app:titleTextColor="@color/white"
+            app:title="Send" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorDark"
+            app:tabTextColor="@color/text_secondary"
+            app:tabSelectedTextColor="@color/colorAccent"
+            app:tabIndicatorColor="@color/colorAccent"
+            app:tabMode="scrollable">
+            <com.google.android.material.tabs.TabItem android:text="WiFi Direct" />
+            <com.google.android.material.tabs.TabItem android:text="QR Link" />
+            <com.google.android.material.tabs.TabItem android:text="Bluetooth" />
+            <com.google.android.material.tabs.TabItem android:text="Share Sheet" />
+        </com.google.android.material.tabs.TabLayout>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- Content Area -->
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        app:layout_constraintTop_toBottomOf="@id/appbar"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_select_file"
+                style="@style/Bebo.Button"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:text="Select Files or Apps"
+                app:icon="@android:drawable/ic_menu_add"
+                app:iconGravity="textStart" />
+
+            <TextView
+                android:id="@+id/tv_selected_files"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No files selected"
+                android:layout_marginTop="8dp"
+                android:textColor="@color/text_secondary"
+                android:textAlignment="center"/>
+
+            <!-- Dynamic Connection View Container -->
+            <FrameLayout
+                android:id="@+id/fl_connection_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp">
+
+                <!-- WiFi Direct Content -->
+                <LinearLayout
+                    android:id="@+id/view_wifi_direct"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+
+                    <Button
+                        android:id="@+id/btn_discover"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="Scan for Devices" />
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/rv_devices"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"
+                        android:layout_marginTop="16dp"/>
+                </LinearLayout>
+
+                <!-- QR Hotspot Content -->
+                <LinearLayout
+                    android:id="@+id/view_qr_link"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:gravity="center">
+
+                    <ImageView
+                        android:id="@+id/iv_qr_code"
+                        android:layout_width="250dp"
+                        android:layout_height="250dp" />
+
+                    <TextView
+                        android:id="@+id/tv_hotspot_url"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="http://192.168.43.1:8080"
+                        android:textIsSelectable="true"
+                        android:textSize="20sp"
+                        android:textColor="@color/colorPrimary"
+                        android:layout_marginTop="16dp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Scan with ANY device (iPhone, PC, Android)"
+                        android:textColor="@color/text_secondary"
+                        android:layout_marginTop="8dp"/>
+                </LinearLayout>
+
+            </FrameLayout>
+
+            <!-- Transfer Progress -->
+            <LinearLayout
+                android:id="@+id/layout_transfer_progress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:layout_marginTop="32dp">
+
+                <TextView
+                    android:id="@+id/tv_progress_info"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Transferring..."
+                    android:textColor="@color/colorDark"
+                    android:textStyle="bold"
+                    android:textAlignment="center" />
+
+                <ProgressBar
+                    android:id="@+id/progress_bar"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp"
+                    android:layout_marginTop="8dp"
+                    android:progressDrawable="@drawable/custom_progress_bar"
+                    android:max="100" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,4 +1,4 @@
-package com.swiftshare
+package com.abanoub.beboanyshare
 
 import android.app.Service
 import android.content.Intent
@@ -316,7 +316,7 @@ class FileTransferService : Service() {
     companion object {
         private const val TAG = "FileTransferService"
         const val ACTION_SEND_FILE = "com.swiftshare.SEND_FILE"
-        const val ACTION_RECEIVE_FILE = "com.swiftshare.RECEIVE_FILE"
+        const val ACTION_RECEIVE_FILE = "com.abanoub.beboanyshare.RECEIVE_FILE"
         const val ACTION_TRANSFER_PROGRESS = "com.swiftshare.TRANSFER_PROGRESS"
 
         const val EXTRA_FILE_URI = "file_uri"

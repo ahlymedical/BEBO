@@ -1,4 +1,4 @@
-package com.swiftshare
+package com.abanoub.beboanyshare
 
 import android.net.wifi.p2p.WifiP2pDevice
 import androidx.lifecycle.LiveData

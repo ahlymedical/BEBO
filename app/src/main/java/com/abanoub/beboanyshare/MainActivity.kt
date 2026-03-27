@@ -1,6 +1,7 @@
-package com.swiftshare
+package com.abanoub.beboanyshare
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
@@ -8,9 +9,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.setupWithNavController
-import com.swiftshare.databinding.ActivityMainBinding
+import com.abanoub.beboanyshare.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,18 +21,53 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val navHostFragment = supportFragmentManager
-            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        val navController = navHostFragment.navController
-        binding.bottomNavigation.setupWithNavController(navController)
-
+        setupListeners()
         checkPermissions()
+    }
+
+    private fun setupListeners() {
+        binding.cardSend.setOnClickListener {
+            startActivity(Intent(this, SenderActivity::class.java))
+        }
+
+        binding.cardReceive.setOnClickListener {
+            startActivity(Intent(this, ReceiverActivity::class.java))
+        }
+
+        binding.quickMedia.setOnClickListener {
+            val intent = Intent(this, SenderActivity::class.java).apply {
+                putExtra("QUICK_ACTION", "MEDIA")
+            }
+            startActivity(intent)
+        }
+
+        binding.quickApps.setOnClickListener {
+            val intent = Intent(this, SenderActivity::class.java).apply {
+                putExtra("QUICK_ACTION", "APPS")
+            }
+            startActivity(intent)
+        }
+
+        binding.quickDocs.setOnClickListener {
+            val intent = Intent(this, SenderActivity::class.java).apply {
+                putExtra("QUICK_ACTION", "DOCS")
+            }
+            startActivity(intent)
+        }
+
+        binding.quickAudio.setOnClickListener {
+            val intent = Intent(this, SenderActivity::class.java).apply {
+                putExtra("QUICK_ACTION", "AUDIO")
+            }
+            startActivity(intent)
+        }
     }
 
     private fun checkPermissions() {
         val requiredPermissions = mutableListOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.CAMERA
         )
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -44,6 +78,11 @@ class MainActivity : AppCompatActivity() {
         } else {
             requiredPermissions.add(Manifest.permission.READ_EXTERNAL_STORAGE)
             requiredPermissions.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            requiredPermissions.add(Manifest.permission.BLUETOOTH_CONNECT)
+            requiredPermissions.add(Manifest.permission.BLUETOOTH_SCAN)
         }
 
         val missingPermissions = requiredPermissions.filter {
@@ -67,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == PERMISSION_REQUEST_CODE) {
             if (grantResults.isNotEmpty() && grantResults.any { it != PackageManager.PERMISSION_GRANTED }) {
-                Toast.makeText(this, R.string.permission_required, Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Permissions are required for BEBO Any Share to work.", Toast.LENGTH_LONG).show()
             }
         }
     }

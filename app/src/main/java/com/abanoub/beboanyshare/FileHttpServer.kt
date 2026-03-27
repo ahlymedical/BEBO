@@ -1,4 +1,4 @@
-package com.swiftshare
+package com.abanoub.beboanyshare
 
 import android.content.Context
 import android.net.Uri

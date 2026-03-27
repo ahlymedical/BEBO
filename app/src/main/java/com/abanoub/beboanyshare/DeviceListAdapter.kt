@@ -1,4 +1,4 @@
-package com.swiftshare
+package com.abanoub.beboanyshare
 
 import android.annotation.SuppressLint
 import android.net.wifi.p2p.WifiP2pDevice
@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.swiftshare.databinding.ItemDeviceBinding
+import com.abanoub.beboanyshare.databinding.ItemDeviceBinding
 
 class DeviceListAdapter(
     private val onDeviceClick: (WifiP2pDevice) -> Unit
