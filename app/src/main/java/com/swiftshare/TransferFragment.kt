@@ -14,11 +14,17 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.graphics.Bitmap
+import android.graphics.Color
+import android.net.wifi.WifiManager
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
+import android.text.format.Formatter
 import com.swiftshare.databinding.FragmentTransferBinding
 import java.util.Locale
 
@@ -33,6 +39,13 @@ class TransferFragment : Fragment() {
     private lateinit var wifiP2pManager: WifiP2pManager
     private lateinit var channel: WifiP2pManager.Channel
     private lateinit var receiver: WifiDirectBroadcastReceiver
+
+    private var httpServer: FileHttpServer? = null
+    private var pendingShareType: ShareType = ShareType.WIFI_DIRECT
+
+    enum class ShareType {
+        WIFI_DIRECT, HTTP_LINK, QR_CODE
+    }
     private val intentFilter = IntentFilter().apply {
         addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION)
         addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION)
@@ -57,7 +70,10 @@ class TransferFragment : Fragment() {
 
     private val filePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
         if (uri != null) {
-            sendFile(uri)
+            when (pendingShareType) {
+                ShareType.WIFI_DIRECT -> sendFile(uri)
+                ShareType.HTTP_LINK, ShareType.QR_CODE -> startHttpServer(uri, pendingShareType == ShareType.QR_CODE)
+            }
         }
     }
 
@@ -77,17 +93,38 @@ class TransferFragment : Fragment() {
 
         setupRecyclerView()
         setupObservers()
-
-        binding.btnDiscover.setOnClickListener {
-            discoverPeers()
-        }
+        setupActionCards()
 
         binding.btnSelectFile.setOnClickListener {
-            if (viewModel.connectionStatus.value == TransferViewModel.ConnectionStatus.CONNECTED) {
-                filePickerLauncher.launch("*/*")
-            } else {
+            if (pendingShareType == ShareType.WIFI_DIRECT && viewModel.connectionStatus.value != TransferViewModel.ConnectionStatus.CONNECTED) {
                 Toast.makeText(requireContext(), "Connect to a device first", Toast.LENGTH_SHORT).show()
+            } else {
+                filePickerLauncher.launch("*/*")
             }
+        }
+    }
+
+    private fun setupActionCards() {
+        binding.cardWifiShare.setOnClickListener {
+            pendingShareType = ShareType.WIFI_DIRECT
+            binding.rvDevices.visibility = View.VISIBLE
+            binding.llQrContainer.visibility = View.GONE
+            discoverPeers()
+        }
+        binding.cardNearbyShare.setOnClickListener {
+            Toast.makeText(requireContext(), "Nearby connections coming soon", Toast.LENGTH_SHORT).show()
+        }
+        binding.cardLinkShare.setOnClickListener {
+            pendingShareType = ShareType.HTTP_LINK
+            binding.rvDevices.visibility = View.GONE
+            binding.llQrContainer.visibility = View.GONE
+            filePickerLauncher.launch("*/*")
+        }
+        binding.cardQrShare.setOnClickListener {
+            pendingShareType = ShareType.QR_CODE
+            binding.rvDevices.visibility = View.GONE
+            binding.llQrContainer.visibility = View.GONE
+            filePickerLauncher.launch("*/*")
         }
     }
 
@@ -102,11 +139,6 @@ class TransferFragment : Fragment() {
     private fun setupObservers() {
         viewModel.discoveredDevices.observe(viewLifecycleOwner) { devices ->
             adapter.submitList(devices)
-            if (devices.isEmpty()) {
-                binding.btnDiscover.text = getString(R.string.no_devices_found)
-            } else {
-                binding.btnDiscover.text = getString(R.string.discover_devices)
-            }
         }
 
         viewModel.connectionStatus.observe(viewLifecycleOwner) { status ->
@@ -194,6 +226,53 @@ class TransferFragment : Fragment() {
         requireContext().startService(intent)
     }
 
+    private fun startHttpServer(fileUri: Uri, showQr: Boolean) {
+        val port = 8080
+        if (httpServer == null) {
+            httpServer = FileHttpServer(port, requireContext().applicationContext, fileUri)
+            try {
+                httpServer?.start()
+            } catch (e: Exception) {
+                Toast.makeText(requireContext(), "Error starting HTTP server", Toast.LENGTH_SHORT).show()
+                return
+            }
+        } else {
+            httpServer?.setFileToServe(fileUri)
+        }
+
+        val wifiManager = requireContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+        val ipAddress = Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
+        val downloadUrl = "http://$ipAddress:$port"
+
+        binding.rvDevices.visibility = View.GONE
+        binding.llQrContainer.visibility = View.VISIBLE
+        binding.tvLinkUrl.text = downloadUrl
+
+        if (showQr) {
+            binding.ivQrCode.setImageBitmap(generateQrCode(downloadUrl))
+            binding.ivQrCode.visibility = View.VISIBLE
+        } else {
+            binding.ivQrCode.visibility = View.GONE
+        }
+    }
+
+    private fun generateQrCode(text: String): Bitmap? {
+        try {
+            val size = 512
+            val bitMatrix = QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, size, size)
+            val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.RGB_565)
+            for (x in 0 until size) {
+                for (y in 0 until size) {
+                    bitmap.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
+                }
+            }
+            return bitmap
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return null
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         receiver = WifiDirectBroadcastReceiver(wifiP2pManager, channel,
@@ -255,6 +334,7 @@ class TransferFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        httpServer?.stop()
         _binding = null
     }
 }

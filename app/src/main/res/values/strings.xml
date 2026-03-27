@@ -1,5 +1,7 @@
 <resources>
-    <string name="app_name">SwiftShare</string>
+    <string name="app_name">BEBO Any Share</string>
+    <string name="developer_name">by Abanoub Lotfy Nakhil</string>
+    <string name="tagline">Share Anything, Anywhere — Instantly</string>
     <string name="title_transfer">Transfer</string>
     <string name="title_history">History</string>
     <string name="title_settings">Settings</string>
@@ -10,5 +12,11 @@
     <string name="status_connecting">Connecting...</string>
     <string name="select_file">Select File</string>
     <string name="transferring">Transferring...</string>
-    <string name="permission_required">Permissions are required for SwiftShare to work.</string>
+    <string name="permission_required">Permissions are required for BEBO Any Share to work.</string>
+
+    <!-- New Sharing Options -->
+    <string name="share_wifi">WiFi Share</string>
+    <string name="share_nearby">Nearby</string>
+    <string name="share_link">Link Share</string>
+    <string name="share_qr">QR Code</string>
 </resources>

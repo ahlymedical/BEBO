@@ -1,12 +1,60 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="108dp"
     android:height="108dp"
     android:viewportWidth="108"
     android:viewportHeight="108">
     <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M31,63.928c0,0 6.4,-11 12.1,-13.1c7.2,-2.6 26,-1.4 26,-1.4l38.1,38.1L107,108.928l-76,-76z" />
+        android:pathData="M0,0h108v108h-108z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:angle="135"
+                android:endColor="#00BCD4"
+                android:startColor="#1A237E"
+                android:type="linear" />
+        </aapt:attr>
+    </path>
+
+    <!-- Infinity Share Arrows Glow (Outer soft) -->
+    <path
+        android:fillAlpha="0.4"
+        android:fillColor="#00E5FF"
+        android:pathData="M 40,40 C 25,25 25,65 40,65 L 68,65 C 83,65 83,25 68,40 Z"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"/>
+
+    <!-- Left Loop (Infinity Arrow Left) -->
+    <path
+        android:pathData="M 68,65 C 80,65 80,45 68,45 C 55,45 55,65 40,65 C 28,65 28,45 40,45"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"/>
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M65.3,45.828l3.8,-3.8c2.8,-2.8 2.8,-7.4 0,-10.2l-3.6,-3.6c-2.8,-2.8 -7.4,-2.8 -10.2,0l-3.8,3.8" />
+        android:pathData="M 36,41 L 44,45 L 36,49 Z"/>
+
+    <!-- Right Loop (Infinity Arrow Right) -->
+    <path
+        android:pathData="M 40,45 C 28,45 28,65 40,65 C 55,65 55,45 68,45 C 80,45 80,65 68,65"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"/>
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 72,69 L 64,65 L 72,61 Z"/>
+
+    <!-- Small Globe representing worldwide sharing -->
+    <path
+        android:pathData="M 54,82 A 8,8 0 1,0 54,66 A 8,8 0 1,0 54,82 Z"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="2"/>
+    <path
+        android:pathData="M 54,66 C 50,66 50,82 54,82 C 58,82 58,66 54,66"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="1.5"/>
+    <path
+        android:pathData="M 46,74 L 62,74 M 48,70 L 60,70 M 48,78 L 60,78"
+        android:strokeColor="#00E5FF"
+        android:strokeWidth="1.5"/>
 </vector>
