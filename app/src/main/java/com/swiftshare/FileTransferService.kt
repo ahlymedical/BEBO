@@ -89,10 +89,18 @@ class FileTransferService : Service() {
                 val dataInputStream = DataInputStream(BufferedInputStream(client.getInputStream()))
 
                 // Read metadata
-                val fileName = dataInputStream.readUTF()
+                val rawFileName = dataInputStream.readUTF()
                 val fileSize = dataInputStream.readLong()
 
-                val receivedFile = File(getExternalFilesDir(null), fileName)
+                // Security Fix: Prevent Path Traversal
+                val sanitizedFileName = File(rawFileName).name
+                val finalFileName = if (sanitizedFileName.isEmpty() || sanitizedFileName == "." || sanitizedFileName == "..") {
+                    "received_file_${System.currentTimeMillis()}"
+                } else {
+                    sanitizedFileName
+                }
+
+                val receivedFile = File(getExternalFilesDir(null), finalFileName)
                 val outputStream = BufferedOutputStream(FileOutputStream(receivedFile))
 
                 val buffer = ByteArray(64 * 1024) // 64KB chunk
@@ -100,7 +108,7 @@ class FileTransferService : Service() {
                 var totalBytesReceived = 0L
                 val startTime = System.currentTimeMillis()
 
-                Log.d(TAG, "Starting to receive file: $fileName, size: $fileSize")
+                Log.d(TAG, "Starting to receive file: $finalFileName, size: $fileSize")
 
                 while (totalBytesReceived < fileSize && dataInputStream.read(buffer, 0, minOf(buffer.size.toLong(), fileSize - totalBytesReceived).toInt()).also { len = it } != -1) {
                     outputStream.write(buffer, 0, len)
@@ -129,7 +137,7 @@ class FileTransferService : Service() {
                 historyManager.addRecord(
                     TransferRecord(
                         id = UUID.randomUUID().toString(),
-                        fileName = fileName,
+                        fileName = finalFileName,
                         filePath = receivedFile.absolutePath,
                         fileSize = totalBytesReceived,
                         timestamp = System.currentTimeMillis(),

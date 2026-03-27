@@ -27,6 +27,11 @@ import com.google.zxing.qrcode.QRCodeWriter
 import android.text.format.Formatter
 import com.swiftshare.databinding.FragmentTransferBinding
 import java.util.Locale
+import android.content.pm.ApplicationInfo
+import android.content.pm.PackageManager
+import androidx.appcompat.app.AlertDialog
+import java.io.File
+import androidx.core.content.FileProvider
 
 class TransferFragment : Fragment() {
 
@@ -44,7 +49,7 @@ class TransferFragment : Fragment() {
     private var pendingShareType: ShareType = ShareType.WIFI_DIRECT
 
     enum class ShareType {
-        WIFI_DIRECT, HTTP_LINK, QR_CODE
+        WIFI_DIRECT, HTTP_LINK, QR_CODE, SHARE_SHEET, BLUETOOTH
     }
     private val intentFilter = IntentFilter().apply {
         addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION)
@@ -73,6 +78,8 @@ class TransferFragment : Fragment() {
             when (pendingShareType) {
                 ShareType.WIFI_DIRECT -> sendFile(uri)
                 ShareType.HTTP_LINK, ShareType.QR_CODE -> startHttpServer(uri, pendingShareType == ShareType.QR_CODE)
+                ShareType.SHARE_SHEET -> shareViaAndroidSheet(uri)
+                ShareType.BLUETOOTH -> shareViaBluetooth(uri)
             }
         }
     }
@@ -94,38 +101,149 @@ class TransferFragment : Fragment() {
         setupRecyclerView()
         setupObservers()
         setupActionCards()
+    }
 
-        binding.btnSelectFile.setOnClickListener {
-            if (pendingShareType == ShareType.WIFI_DIRECT && viewModel.connectionStatus.value != TransferViewModel.ConnectionStatus.CONNECTED) {
-                Toast.makeText(requireContext(), "Connect to a device first", Toast.LENGTH_SHORT).show()
+    private fun setupActionCards() {
+        // Toggle Switch setup
+        binding.rgSendReceive.setOnCheckedChangeListener { _, checkedId ->
+            if (checkedId == binding.rbSend.id) {
+                binding.rbSend.setTextColor(requireContext().getColor(R.color.colorOnPrimary))
+                binding.rbReceive.setTextColor(requireContext().getColor(R.color.colorPrimary))
+                binding.gridShareSources.visibility = View.VISIBLE
             } else {
-                filePickerLauncher.launch("*/*")
+                binding.rbReceive.setTextColor(requireContext().getColor(R.color.colorOnPrimary))
+                binding.rbSend.setTextColor(requireContext().getColor(R.color.colorPrimary))
+                binding.gridShareSources.visibility = View.GONE
+            }
+        }
+
+        // 2x2 Share Source Grid
+        binding.cardSrcFiles.setOnClickListener { triggerFileSelection() }
+        binding.cardSrcApps.setOnClickListener { showAppPicker() }
+        binding.cardSrcDocs.setOnClickListener { triggerFileSelection("application/*") }
+        binding.cardSrcAudio.setOnClickListener { triggerFileSelection("audio/*", "video/*") }
+
+        // Share Methods (Chips)
+        binding.chipGroupMethods.setOnCheckedStateChangeListener { group, checkedIds ->
+            if (checkedIds.isEmpty()) return@setOnCheckedStateChangeListener
+
+            when (checkedIds.first()) {
+                binding.chipWifi.id -> {
+                    pendingShareType = ShareType.WIFI_DIRECT
+                    binding.rvDevices.visibility = View.VISIBLE
+                    binding.llQrContainer.visibility = View.GONE
+                    discoverPeers()
+                }
+                binding.chipQrLink.id -> {
+                    pendingShareType = ShareType.HTTP_LINK
+                    binding.rvDevices.visibility = View.GONE
+                    binding.llQrContainer.visibility = View.GONE
+                }
+                binding.chipQrScan.id -> {
+                    pendingShareType = ShareType.QR_CODE
+                    binding.rvDevices.visibility = View.GONE
+                    binding.llQrContainer.visibility = View.GONE
+                }
+                binding.chipSheet.id -> {
+                    pendingShareType = ShareType.SHARE_SHEET
+                    binding.rvDevices.visibility = View.GONE
+                    binding.llQrContainer.visibility = View.GONE
+                }
+                binding.chipBluetooth.id -> {
+                    pendingShareType = ShareType.BLUETOOTH
+                    binding.rvDevices.visibility = View.GONE
+                    binding.llQrContainer.visibility = View.GONE
+                }
+                binding.chipNearby.id -> {
+                    Toast.makeText(requireContext(), "Method coming soon", Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
 
-    private fun setupActionCards() {
-        binding.cardWifiShare.setOnClickListener {
-            pendingShareType = ShareType.WIFI_DIRECT
-            binding.rvDevices.visibility = View.VISIBLE
-            binding.llQrContainer.visibility = View.GONE
-            discoverPeers()
+    private fun shareViaAndroidSheet(uri: Uri) {
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = requireContext().contentResolver.getType(uri) ?: "*/*"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        binding.cardNearbyShare.setOnClickListener {
-            Toast.makeText(requireContext(), "Nearby connections coming soon", Toast.LENGTH_SHORT).show()
+        startActivity(Intent.createChooser(shareIntent, "Share file via..."))
+    }
+
+    private fun shareViaBluetooth(uri: Uri) {
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = requireContext().contentResolver.getType(uri) ?: "*/*"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            setPackage("com.android.bluetooth")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        binding.cardLinkShare.setOnClickListener {
-            pendingShareType = ShareType.HTTP_LINK
-            binding.rvDevices.visibility = View.GONE
-            binding.llQrContainer.visibility = View.GONE
-            filePickerLauncher.launch("*/*")
+        try {
+            startActivity(shareIntent)
+        } catch (e: Exception) {
+            shareIntent.setPackage(null)
+            startActivity(Intent.createChooser(shareIntent, "Share file via Bluetooth..."))
         }
-        binding.cardQrShare.setOnClickListener {
-            pendingShareType = ShareType.QR_CODE
-            binding.rvDevices.visibility = View.GONE
-            binding.llQrContainer.visibility = View.GONE
-            filePickerLauncher.launch("*/*")
+    }
+
+    private fun triggerFileSelection(vararg mimeTypes: String) {
+        if (pendingShareType == ShareType.WIFI_DIRECT && viewModel.connectionStatus.value != TransferViewModel.ConnectionStatus.CONNECTED) {
+            Toast.makeText(requireContext(), "Connect to a device first via WiFi", Toast.LENGTH_SHORT).show()
+            return
         }
+
+        val typeToLaunch = if (mimeTypes.isEmpty()) {
+            "*/*"
+        } else if (mimeTypes.size == 1) {
+            mimeTypes[0]
+        } else {
+            // ActivityResultContracts.GetContent() only allows one string. For multiple, we'd need OpenDocument,
+            // but for simplicity we'll just fall back to */* if multiple are requested, or pick the first.
+            // A more robust approach uses OpenDocument contract, but this works for basic integration.
+            "*/*"
+        }
+        filePickerLauncher.launch(typeToLaunch)
+    }
+
+    private fun showAppPicker() {
+        if (pendingShareType == ShareType.WIFI_DIRECT && viewModel.connectionStatus.value != TransferViewModel.ConnectionStatus.CONNECTED) {
+            Toast.makeText(requireContext(), "Connect to a device first via WiFi", Toast.LENGTH_SHORT).show()
+            return
+        }
+        val pm = requireContext().packageManager
+        val apps = pm.getInstalledApplications(PackageManager.GET_META_DATA)
+            .filter { (it.flags and ApplicationInfo.FLAG_SYSTEM) == 0 } // Exclude system apps
+            .sortedBy { pm.getApplicationLabel(it).toString() }
+
+        if (apps.isEmpty()) {
+            Toast.makeText(requireContext(), "No user apps found", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val appNames = apps.map { pm.getApplicationLabel(it).toString() }.toTypedArray()
+
+        AlertDialog.Builder(requireContext())
+            .setTitle(R.string.select_apps)
+            .setItems(appNames) { _, which ->
+                val selectedApp = apps[which]
+                val apkFile = File(selectedApp.publicSourceDir)
+                if (apkFile.exists()) {
+                    val uri = FileProvider.getUriForFile(
+                        requireContext(),
+                        "${requireContext().packageName}.provider",
+                        apkFile
+                    )
+                    when (pendingShareType) {
+                        ShareType.WIFI_DIRECT -> sendFile(uri)
+                        ShareType.HTTP_LINK, ShareType.QR_CODE -> startHttpServer(uri, pendingShareType == ShareType.QR_CODE)
+                        ShareType.SHARE_SHEET -> shareViaAndroidSheet(uri)
+                        ShareType.BLUETOOTH -> shareViaBluetooth(uri)
+                    }
+                } else {
+                    Toast.makeText(requireContext(), "APK not found", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
     }
 
     private fun setupRecyclerView() {
@@ -147,7 +265,6 @@ class TransferFragment : Fragment() {
                 TransferViewModel.ConnectionStatus.CONNECTING -> getString(R.string.status_connecting)
                 TransferViewModel.ConnectionStatus.CONNECTED -> getString(R.string.status_connected)
             }
-            binding.btnSelectFile.isEnabled = status == TransferViewModel.ConnectionStatus.CONNECTED
         }
 
         viewModel.transferProgress.observe(viewLifecycleOwner) { progress ->
@@ -241,7 +358,15 @@ class TransferFragment : Fragment() {
         }
 
         val wifiManager = requireContext().applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
-        val ipAddress = Formatter.formatIpAddress(wifiManager.connectionInfo.ipAddress)
+        val ipInt = wifiManager.connectionInfo.ipAddress
+        val ipAddress = String.format(
+            Locale.getDefault(),
+            "%d.%d.%d.%d",
+            ipInt and 0xFF,
+            ipInt shr 8 and 0xFF,
+            ipInt shr 16 and 0xFF,
+            ipInt shr 24 and 0xFF
+        )
         val downloadUrl = "http://$ipAddress:$port"
 
         binding.rvDevices.visibility = View.GONE

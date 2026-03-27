@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/background"
+    android:background="@color/colorBackground"
     tools:context=".MainActivity">
 
     <!-- Header Section -->
@@ -12,7 +12,7 @@
         android:id="@+id/header_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/primary"
+        android:background="@color/colorPrimary"
         android:orientation="vertical"
         android:paddingTop="32dp"
         android:paddingBottom="32dp"
@@ -36,7 +36,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/developer_name"
-            android:textColor="@color/accent"
+            android:textColor="@color/colorAccent"
             android:textSize="14sp"
             android:textStyle="italic"
             android:textAlignment="center"/>
@@ -68,9 +68,9 @@
         android:id="@+id/bottom_navigation"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="@color/surface"
-        app:itemIconTint="@color/primary"
-        app:itemTextColor="@color/primary"
+        android:background="@color/colorSurface"
+        app:itemIconTint="@color/colorPrimary"
+        app:itemTextColor="@color/colorPrimary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"

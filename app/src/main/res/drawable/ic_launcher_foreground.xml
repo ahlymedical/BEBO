@@ -8,53 +8,49 @@
         android:pathData="M0,0h108v108h-108z">
         <aapt:attr name="android:fillColor">
             <gradient
-                android:angle="135"
-                android:endColor="#00BCD4"
-                android:startColor="#1A237E"
-                android:type="linear" />
+                android:startX="0"
+                android:startY="108"
+                android:endX="108"
+                android:endY="0"
+                android:type="linear">
+                <item android:offset="0" android:color="#0A0A2E"/>
+                <item android:offset="0.5" android:color="#1565C0"/>
+                <item android:offset="1" android:color="#00BCD4"/>
+            </gradient>
         </aapt:attr>
     </path>
 
-    <!-- Infinity Share Arrows Glow (Outer soft) -->
+    <!-- Outer Glow -->
     <path
-        android:fillAlpha="0.4"
         android:fillColor="#00E5FF"
-        android:pathData="M 40,40 C 25,25 25,65 40,65 L 68,65 C 83,65 83,25 68,40 Z"
-        android:strokeColor="#00E5FF"
-        android:strokeWidth="6"
-        android:strokeLineCap="round"/>
-
-    <!-- Left Loop (Infinity Arrow Left) -->
+        android:fillAlpha="0.3"
+        android:pathData="M 38,38 L 70,38 L 70,70 L 38,70 Z">
+        <!-- We use a pseudo-blur by adding semi-transparent layers -->
+    </path>
     <path
-        android:pathData="M 68,65 C 80,65 80,45 68,45 C 55,45 55,65 40,65 C 28,65 28,45 40,45"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="4"
-        android:strokeLineCap="round"/>
+        android:fillColor="#00E5FF"
+        android:fillAlpha="0.15"
+        android:pathData="M 34,34 L 74,34 L 74,74 L 34,74 Z" />
+
+    <!-- "BA" Monogram -->
+    <!-- The "B" with Wifi Arcs -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M 36,41 L 44,45 L 36,49 Z"/>
+        android:pathData="M 40,35 L 40,75 L 50,75 C 55,75 58,72 58,68 C 58,65 56,62 52,60 C 56,58 58,55 58,52 C 58,48 55,45 50,45 L 45,45 L 45,35 Z M 45,50 L 50,50 C 52,50 53,51 53,52 C 53,53 52,54 50,54 L 45,54 Z M 45,60 L 50,60 C 52,60 53,61 53,62 C 53,63 52,64 50,64 L 45,64 Z" />
 
-    <!-- Right Loop (Infinity Arrow Right) -->
-    <path
-        android:pathData="M 40,45 C 28,45 28,65 40,65 C 55,65 55,45 68,45 C 80,45 80,65 68,65"
-        android:strokeColor="#FFFFFF"
-        android:strokeWidth="4"
-        android:strokeLineCap="round"/>
+    <!-- The "A" with Upward Arrow -->
     <path
         android:fillColor="#FFFFFF"
-        android:pathData="M 72,69 L 64,65 L 72,61 Z"/>
+        android:pathData="M 50,75 L 60,40 L 70,75 L 65,75 L 62,65 L 55,65 L 52,75 Z M 57,55 L 61,55 L 59,48 Z" />
 
-    <!-- Small Globe representing worldwide sharing -->
     <path
-        android:pathData="M 54,82 A 8,8 0 1,0 54,66 A 8,8 0 1,0 54,82 Z"
-        android:strokeColor="#00E5FF"
-        android:strokeWidth="2"/>
-    <path
-        android:pathData="M 54,66 C 50,66 50,82 54,82 C 58,82 58,66 54,66"
-        android:strokeColor="#00E5FF"
-        android:strokeWidth="1.5"/>
-    <path
-        android:pathData="M 46,74 L 62,74 M 48,70 L 60,70 M 48,78 L 60,78"
-        android:strokeColor="#00E5FF"
-        android:strokeWidth="1.5"/>
+        android:fillColor="#00E5FF"
+        android:pathData="M 60,32 L 64,38 L 56,38 Z" />
+
+    <!-- Small network connection dots -->
+    <path android:fillColor="#00E5FF" android:pathData="M 28,30 A 2,2 0 1,1 28,34 A 2,2 0 1,1 28,30" />
+    <path android:fillColor="#00E5FF" android:pathData="M 80,70 A 2,2 0 1,1 80,74 A 2,2 0 1,1 80,70" />
+    <path android:fillColor="#00E5FF" android:pathData="M 75,25 A 1.5,1.5 0 1,1 75,28 A 1.5,1.5 0 1,1 75,25" />
+    <path android:fillColor="#00E5FF" android:pathData="M 30,75 A 1.5,1.5 0 1,1 30,78 A 1.5,1.5 0 1,1 30,75" />
+
 </vector>
