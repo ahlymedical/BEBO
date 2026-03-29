@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Silence Remover 🎬</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/CSInterface.js"></script>
+  <script src="js/main.js"></script>
+</head>
+<body>
+
+  <!-- Section 1 -->
+  <div class="card" id="section1">
+    <h2>📄 الخطوة 1: ارفع ملف SRT</h2>
+    <label for="srtFile" class="upload-btn">
+      اختر ملف SRT أو VTT
+    </label>
+    <input type="file" id="srtFile" accept=".srt,.vtt">
+    <div id="fileInfo">لم يتم اختيار أي ملف بعد.</div>
+  </div>
+
+  <!-- Section 2 -->
+  <div class="card" id="section2">
+    <h2>⚙️ الخطوة 2: ضبط الإعدادات</h2>
+
+    <div class="input-group">
+      <label for="minGap">الحد الأدنى للصمت (ثانية)</label>
+      <input type="number" id="minGap" value="0.5" min="0.1" max="10" step="0.1">
+    </div>
+
+    <div class="input-group">
+      <label for="paddingBefore">هامش قبل الكلام (مللي ثانية)</label>
+      <input type="number" id="paddingBefore" value="100" min="0" max="1000" step="50">
+    </div>
+
+    <div class="input-group">
+      <label for="paddingAfter">هامش بعد الكلام (مللي ثانية)</label>
+      <input type="number" id="paddingAfter" value="100" min="0" max="1000" step="50">
+    </div>
+  </div>
+
+  <!-- Section 3 -->
+  <div class="card" id="section3">
+    <h2>🚀 الخطوة 3: التنفيذ</h2>
+    <button id="btnRemove" disabled>✂️ احذف فترات الصمت</button>
+    <button id="btnClose" disabled>🔗 اجمع الكليبات جنب بعض</button>
+  </div>
+
+  <!-- Log Area -->
+  <div id="logArea"></div>
+
+</body>
+</html>
