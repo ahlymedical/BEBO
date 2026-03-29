@@ -3,28 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Silence Remover 🎬</title>
+  <title>Silence Remover Pro 🎬</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- Section 1 -->
-  <div class="section">
+  <div class="card">
+    <h2 style="margin: 0; color: white;">🎬 Silence Remover Pro</h2>
+    <p style="margin: 4px 0 16px; color: #aaa; font-size: 11px;">أداة إزالة الصمت من التايم لاين</p>
+
+    <!-- SECTION: رفع الملف -->
+    <span class="section-label">📄 ارفع ملف الترجمة SRT</span>
     <label for="srtFile" class="upload-btn">
-      اختر ملف SRT
+      📂 اختر ملف .SRT أو .VTT
+      <input type="file" id="srtFile" accept=".srt,.vtt" style="display: none;">
     </label>
-    <input type="file" id="srtFile" accept=".srt,.vtt">
     <div id="fileInfo"></div>
-  </div>
 
-  <!-- Section 2 -->
-  <div class="section">
-    <button id="btnRemove" disabled>✂️ احذف فترات الصمت</button>
-    <button id="btnClose" disabled>🔗 اجمع الكليبات جنب بعض</button>
-  </div>
+    <!-- SECTION: الحالة -->
+    <span class="section-label" style="margin-top: 12px;">📊 حالة السيكوانس</span>
+    <div id="seqStatus">⏳ في انتظار ملف الترجمة...</div>
 
-  <!-- Section 3 -->
-  <div class="section">
+    <!-- SECTION: الأزرار -->
+    <div style="margin-top: 16px;">
+      <button id="btnRemove" disabled>✂️ احذف فترات الصمت</button>
+      <div class="hint">يمسح كل الفراغات من التايم لاين الحالي</div>
+
+      <button id="btnClose" disabled>🔗 اجمع الكليبات جنب بعض</button>
+      <div class="hint">يلصق الكليبات المتبقية ببعضها</div>
+    </div>
+
+    <!-- SECTION: اللوج -->
+    <div class="log-header" style="margin-top: 16px;">
+      <span class="section-label" style="margin: 0;">📋 السجل</span>
+      <button id="btnClearLog">مسح</button>
+    </div>
     <div id="logArea"></div>
   </div>
 

@@ -26,7 +26,7 @@
         <Lifecycle><AutoVisible>true</AutoVisible></Lifecycle>
         <UI>
           <Type>Panel</Type>
-          <Menu>Silence Remover 🎬</Menu>
+          <Menu>Silence Remover Pro 🎬</Menu>
           <Geometry>
             <Size><Height>480</Height><Width>320</Width></Size>
           </Geometry>

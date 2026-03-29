@@ -1,54 +1,85 @@
-var csInterface = null;
+var csInterface = new CSInterface();
 var srtContent = "";
+var isProcessing = false;
 
-document.addEventListener("DOMContentLoaded", function() {
-  try {
-    csInterface = new CSInterface();
-  } catch (e) {
-    log("خطأ في تهيئة CSInterface");
+function log(msg) {
+  var logArea = document.getElementById("logArea");
+  var now = new Date();
+
+  var timeStr = now.toLocaleTimeString("ar-EG");
+  var newLine = "[" + timeStr + "] " + msg + "\n";
+
+  logArea.textContent = newLine + logArea.textContent;
+}
+
+function updateSeqStatus() {
+  var seqStatus = document.getElementById("seqStatus");
+  if (csInterface) {
+    csInterface.evalScript("getSequenceName()", function(result) {
+      if (result && result !== "undefined" && result !== "null") {
+        seqStatus.textContent = "✅ سيكوانس: " + result;
+        seqStatus.style.color = "#4caf50";
+      } else {
+        seqStatus.textContent = "⚠️ لا يوجد سيكوانس نشط — افتح سيكوانس في بريمير";
+        seqStatus.style.color = "#e94560";
+      }
+    });
   }
+}
+
+function enableBtn(btn) {
+  btn.disabled = false;
+}
+
+function disableBtn(btn) {
+  btn.disabled = true;
+}
+
+window.onload = function() {
+  updateSeqStatus();
+  setInterval(updateSeqStatus, 3000);
 
   var fileInput = document.getElementById("srtFile");
   var fileInfo = document.getElementById("fileInfo");
   var btnRemove = document.getElementById("btnRemove");
   var btnClose = document.getElementById("btnClose");
+  var btnClearLog = document.getElementById("btnClearLog");
+  var logArea = document.getElementById("logArea");
 
-  fileInput.addEventListener("change", function(e) {
-    var file = e.target.files[0];
+  fileInput.addEventListener("change", function(event) {
+    var file = event.target.files[0];
     if (!file) return;
 
     var reader = new FileReader();
     reader.onload = function(evt) {
       srtContent = evt.target.result;
+      var matches = srtContent.match(/\d{2}:\d{2}:\d{2}[,\.]\d{3}\s*-->/g);
+      var count = matches ? matches.length : 0;
 
-      var count = 0;
-      var match = srtContent.match(/\d{2}:\d{2}:\d{2}[,\.]\d{3}\s*-->/g);
-      if (match) {
-        count = match.length;
-      }
+      fileInfo.textContent = "✅ " + file.name + " — " + count + " توقيت";
+      fileInfo.className = "visible";
 
-      if (count > 0) {
-        fileInfo.textContent = "✅ تم تحميل: " + file.name + " (" + count + " ترجمة)";
-        btnRemove.disabled = false;
-        log("تم تحميل ملف SRT: " + file.name);
-      } else {
-        fileInfo.textContent = "❌ لم يتم العثور على ترجمات صالحة";
-        btnRemove.disabled = true;
-        srtContent = "";
-        log("خطأ: ملف SRT غير صالح");
-      }
+      enableBtn(btnRemove);
+      log("📄 تم تحميل: " + file.name + " (" + count + " توقيت)");
     };
     reader.onerror = function() {
-      log("خطأ أثناء قراءة الملف.");
+      log("❌ فشل في قراءة الملف");
     };
     reader.readAsText(file, "UTF-8");
   });
 
   btnRemove.addEventListener("click", function() {
+    if (isProcessing) return;
     if (!srtContent) {
-      log("يرجى تحميل ملف SRT أولاً.");
+      log("⚠️ ارفع ملف SRT أولاً");
       return;
     }
+
+    isProcessing = true;
+    disableBtn(btnRemove);
+    disableBtn(btnClose);
+
+    log("⏳ جاري تحليل الترجمة ومسح الفراغات...");
 
     var escaped = srtContent
       .replace(/\\/g, "\\\\")
@@ -56,63 +87,39 @@ document.addEventListener("DOMContentLoaded", function() {
       .replace(/\n/g, "\\n")
       .replace(/\r/g, "");
 
-    log("جاري البحث عن فترات الصمت وحذفها...");
-    btnRemove.disabled = true;
-
-    if (csInterface) {
-      csInterface.evalScript('removeSilenceGaps("' + escaped + '")', function(result) {
-        btnRemove.disabled = false;
-        try {
-          var resObj = JSON.parse(result);
-          log(resObj.message);
-          if (resObj.success) {
-            btnClose.disabled = false;
+    csInterface.evalScript('removeSilenceGaps("' + escaped + '")', function(result) {
+      isProcessing = false;
+      enableBtn(btnRemove);
+      try {
+        var res = JSON.parse(result);
+        if (res.success) {
+          log("✅ " + res.message);
+          if (res.count > 0) {
+            enableBtn(btnClose);
           }
-        } catch (e) {
-          log("فشل تحليل النتيجة: " + result);
+        } else {
+          log("❌ " + res.message);
         }
-      });
-    } else {
-      btnRemove.disabled = false;
-      log("CSInterface غير متوفر. يتم محاكاة العملية.");
-    }
+      } catch(e) {
+        log("⚠️ نتيجة غير متوقعة: " + result);
+      }
+    });
   });
 
   btnClose.addEventListener("click", function() {
-    log("جاري تجميع الكليبات...");
-    btnClose.disabled = true;
-
-    if (csInterface) {
-      csInterface.evalScript("closeAllGaps()", function(result) {
-        btnClose.disabled = false;
-        try {
-          var resObj = JSON.parse(result);
-          log(resObj.message);
-        } catch (e) {
-          log("فشل تحليل النتيجة: " + result);
-        }
-      });
-    } else {
-      btnClose.disabled = false;
-      log("CSInterface غير متوفر. يتم محاكاة العملية.");
-    }
+    log("⏳ جاري تجميع الكليبات...");
+    disableBtn(btnClose);
+    csInterface.evalScript("closeAllGaps()", function(result) {
+      try {
+        var res = JSON.parse(result);
+        log(res.success ? "✅ " + res.message : "❌ " + res.message);
+      } catch(e) {
+        log("⚠️ " + result);
+      }
+    });
   });
-});
 
-function log(msg) {
-  var logArea = document.getElementById("logArea");
-  var now = new Date();
-
-  var hours = now.getHours();
-  var minutes = now.getMinutes();
-  var seconds = now.getSeconds();
-
-  if (hours < 10) hours = "0" + hours;
-  if (minutes < 10) minutes = "0" + minutes;
-  if (seconds < 10) seconds = "0" + seconds;
-
-  var timeStr = hours + ":" + minutes + ":" + seconds;
-
-  logArea.textContent += "[" + timeStr + "] " + msg + "\n";
-  logArea.scrollTop = logArea.scrollHeight;
-}
+  btnClearLog.addEventListener("click", function() {
+    logArea.textContent = "";
+  });
+};
