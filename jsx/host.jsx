@@ -1,27 +1,23 @@
 function parseSRT(content) {
   var lines = content.replace(/\\n/g, "\n").replace(/\r/g, "");
-  var blocks = lines.split(/\n\n+/);
+  var timecodeRegex = /(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})/g;
   var entries = [];
+  var match;
 
-  var timecodeRegex = /(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})\s*-->\s*(\d{2}):(\d{2}):(\d{2})[,\.](\d{3})/;
+  while ((match = timecodeRegex.exec(lines)) !== null) {
+    var startH = parseInt(match[1], 10);
+    var startM = parseInt(match[2], 10);
+    var startS = parseInt(match[3], 10);
+    var startMS = parseInt(match[4], 10);
+    var start = startH * 3600 + startM * 60 + startS + startMS / 1000;
 
-  for (var i = 0; i < blocks.length; i++) {
-    var match = blocks[i].match(timecodeRegex);
-    if (match) {
-      var startH = parseInt(match[1], 10);
-      var startM = parseInt(match[2], 10);
-      var startS = parseInt(match[3], 10);
-      var startMS = parseInt(match[4], 10);
-      var start = startH * 3600 + startM * 60 + startS + startMS / 1000;
+    var endH = parseInt(match[5], 10);
+    var endM = parseInt(match[6], 10);
+    var endS = parseInt(match[7], 10);
+    var endMS = parseInt(match[8], 10);
+    var end = endH * 3600 + endM * 60 + endS + endMS / 1000;
 
-      var endH = parseInt(match[5], 10);
-      var endM = parseInt(match[6], 10);
-      var endS = parseInt(match[7], 10);
-      var endMS = parseInt(match[8], 10);
-      var end = endH * 3600 + endM * 60 + endS + endMS / 1000;
-
-      entries.push({ start: start, end: end });
-    }
+    entries.push({ start: start, end: end });
   }
 
   entries.sort(function(a, b) {
@@ -71,13 +67,20 @@ function removeSilenceGaps(srtContent, minGap, padBefore, padAfter) {
         var extractCmd = app.findMenuCommand("Extract");
         if (extractCmd) {
           app.executeCommand(extractCmd);
+          removed++;
         } else {
           app.executeCommand(3001); // Fallback command ID for Extract
+          removed++;
         }
       } catch (err) {
-        app.executeCommand(3001);
+        // Fallback if executeCommand fails on some Premiere versions
+        try {
+          app.executeCommand(3001);
+          removed++;
+        } catch (e2) {
+          // Ignore error and continue with the next gap
+        }
       }
-      removed++;
     }
 
     return JSON.stringify({ success: true, message: "✅ تم حذف " + removed + " فترة صمت من أصل " + gaps.length, count: removed });
