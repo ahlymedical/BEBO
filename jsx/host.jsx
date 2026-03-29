@@ -27,7 +27,7 @@ function parseSRT(content) {
   return entries;
 }
 
-function removeSilenceGaps(srtContent) {
+function getSilenceGaps(srtContent) {
   try {
     var seq = app.project.activeSequence;
     if (!seq) return JSON.stringify({
@@ -54,39 +54,47 @@ function removeSilenceGaps(srtContent) {
     if (gaps.length === 0) return JSON.stringify({
       success: true,
       message: "لا توجد فراغات في هذا الملف.",
-      count: 0
+      gaps: []
     });
 
+    // Sort DESCENDING to prevent timeline drift
     gaps.sort(function(a, b) {
       return b.start - a.start;
     });
 
-    var removed = 0;
-    var k;
-    for (k = 0; k < gaps.length; k++) {
-      seq.setInPoint(gaps[k].start);
-      seq.setOutPoint(gaps[k].end);
-      try {
-        app.executeCommand(app.findMenuCommand("Extract"));
-        removed++;
-      } catch(cmdErr) {
-        try {
-          app.executeCommand(3001);
-          removed++;
-        } catch(e2) {}
-      }
-    }
-
     return JSON.stringify({
       success: true,
-      message: "تم مسح " + removed + " فراغ من أصل " + gaps.length + " في السيكوانس.",
-      count: removed
+      message: "تم تجهيز " + gaps.length + " فراغ للمسح.",
+      gaps: gaps
     });
   } catch(e) {
     return JSON.stringify({
       success: false,
       message: "خطأ: " + e.toString()
     });
+  }
+}
+
+function extractSingleGap(start, end) {
+  try {
+    var seq = app.project.activeSequence;
+    if (!seq) return JSON.stringify({ success: false, message: "لا يوجد سيكوانس" });
+
+    seq.setInPoint(start);
+    seq.setOutPoint(end);
+
+    try {
+      app.executeCommand(app.findMenuCommand("Extract"));
+    } catch(cmdErr) {
+      try {
+        app.executeCommand(3001);
+      } catch(e2) {
+        return JSON.stringify({ success: false, message: "فشل في المسح" });
+      }
+    }
+    return JSON.stringify({ success: true });
+  } catch(e) {
+    return JSON.stringify({ success: false, message: e.toString() });
   }
 }
 

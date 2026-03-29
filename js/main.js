@@ -79,7 +79,7 @@ window.onload = function() {
     disableBtn(btnRemove);
     disableBtn(btnClose);
 
-    log("⏳ جاري تحليل الترجمة ومسح الفراغات...");
+    log("⏳ جاري تحليل الترجمة واستخراج الفراغات...");
 
     var escaped = srtContent
       .replace(/\\/g, "\\\\")
@@ -87,24 +87,60 @@ window.onload = function() {
       .replace(/\n/g, "\\n")
       .replace(/\r/g, "");
 
-    csInterface.evalScript('removeSilenceGaps("' + escaped + '")', function(result) {
-      isProcessing = false;
-      enableBtn(btnRemove);
+    csInterface.evalScript('getSilenceGaps("' + escaped + '")', function(result) {
       try {
         var res = JSON.parse(result);
         if (res.success) {
-          log("✅ " + res.message);
-          if (res.count > 0) {
-            enableBtn(btnClose);
+          if (res.gaps && res.gaps.length > 0) {
+            log("✅ تم العثور على " + res.gaps.length + " فراغ. جاري المسح التدريجي...");
+            processGapsOneByOne(res.gaps, 0);
+          } else {
+            log("✅ لا توجد فراغات للمسح.");
+            isProcessing = false;
+            enableBtn(btnRemove);
           }
         } else {
           log("❌ " + res.message);
+          isProcessing = false;
+          enableBtn(btnRemove);
         }
       } catch(e) {
         log("⚠️ نتيجة غير متوقعة: " + result);
+        isProcessing = false;
+        enableBtn(btnRemove);
       }
     });
   });
+
+  function processGapsOneByOne(gaps, index) {
+    if (index >= gaps.length) {
+      log("🎉 انتهى المسح! تم إزالة " + gaps.length + " فراغ.");
+      isProcessing = false;
+      enableBtn(btnRemove);
+      enableBtn(btnClose);
+      return;
+    }
+
+    var gap = gaps[index];
+    csInterface.evalScript("extractSingleGap(" + gap.start + ", " + gap.end + ")", function(res) {
+      try {
+        var r = JSON.parse(res);
+        if (!r.success) {
+          log("⚠️ خطأ في مسح الفراغ رقم " + (index+1));
+        }
+      } catch(e) {}
+
+      // Update UI log roughly every 10 gaps to prevent spamming the UI
+      if (index % 10 === 0 || index === gaps.length - 1) {
+         log("✂️ جاري مسح... (" + (index + 1) + " من " + gaps.length + ")");
+      }
+
+      // Give Premiere 50ms to breathe and update the UI
+      setTimeout(function() {
+        processGapsOneByOne(gaps, index + 1);
+      }, 50);
+    });
+  }
 
   btnClose.addEventListener("click", function() {
     log("⏳ جاري تجميع الكليبات...");
@@ -116,6 +152,7 @@ window.onload = function() {
       } catch(e) {
         log("⚠️ " + result);
       }
+      enableBtn(btnClose);
     });
   });
 
