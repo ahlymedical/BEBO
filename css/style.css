@@ -6,117 +6,74 @@ body {
   margin: 0;
   padding: 10px;
   background-color: #1a1a2e;
-  color: #fff;
+  color: #eaeaea;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   direction: rtl;
   font-size: 14px;
 }
 
-h2 {
-  font-size: 16px;
-  margin-top: 0;
-  margin-bottom: 10px;
-  color: #e94560;
-}
-
-.card {
+.section {
   background-color: #16213e;
-  border-radius: 8px;
+  border: 1px solid #0f3460;
+  border-radius: 10px;
   padding: 15px;
   margin-bottom: 15px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
 .upload-btn {
   display: block;
-  background-color: #0f3460;
-  color: #fff;
   text-align: center;
-  padding: 10px;
-  border-radius: 5px;
+  padding: 15px;
+  border: 1px dashed #e94560;
   cursor: pointer;
-  border: 1px solid #e94560;
-  transition: background-color 0.2s;
+  margin-bottom: 10px;
 }
 
-.upload-btn:hover {
-  background-color: #e94560;
-}
-
-#srtFile {
+input[type=file] {
   display: none;
 }
 
 #fileInfo {
-  margin-top: 10px;
-  font-size: 13px;
-  color: #a0a0a0;
+  color: #4caf50;
   text-align: center;
-}
-
-.input-group {
-  margin-bottom: 10px;
-}
-
-.input-group:last-child {
-  margin-bottom: 0;
-}
-
-.input-group label {
-  display: block;
-  margin-bottom: 5px;
   font-size: 13px;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #0f3460;
-  background-color: #1a1a2e;
-  color: #fff;
-  border-radius: 4px;
+  min-height: 20px;
 }
 
 button {
-  width: 100%;
   padding: 12px;
   border: none;
   border-radius: 5px;
-  color: #fff;
   font-weight: bold;
   cursor: pointer;
   font-size: 14px;
   margin-bottom: 10px;
-  transition: opacity 0.2s;
+  width: 100%;
 }
 
 button:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
 #btnRemove {
   background-color: #e94560;
+  color: white;
 }
 
 #btnClose {
   background-color: #28a745;
+  color: white;
   margin-bottom: 0;
 }
 
 #logArea {
-  height: 120px;
-  background-color: #0f3460;
-  color: #fff;
+  background-color: #0d0d1a;
+  max-height: 120px;
+  overflow-y: auto;
   font-family: monospace;
   font-size: 12px;
   padding: 10px;
   border-radius: 5px;
-  overflow-y: auto;
-  border: 1px solid #16213e;
-}
-
-.log-entry {
-  margin-bottom: 5px;
-  word-wrap: break-word;
+  white-space: pre-wrap;
 }
