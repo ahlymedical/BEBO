@@ -1,0 +1,156 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #1a1a2e;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  direction: rtl;
+  font-size: 13px;
+  margin: 0;
+  padding: 0;
+}
+
+.card {
+  background-color: #16213e;
+  border-radius: 12px;
+  padding: 16px;
+  margin: 12px;
+  border: 1px solid #0f3460;
+}
+
+.section-label {
+  color: #e94560;
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.upload-btn {
+  display: block;
+  background-color: #0f3460;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  border: 2px dashed #e94560;
+  transition: all 0.2s;
+}
+
+.upload-btn:hover {
+  background-color: #e94560;
+  border-style: solid;
+}
+
+#fileInfo {
+  color: #4caf50;
+  font-size: 12px;
+  text-align: center;
+  padding: 4px;
+  display: none;
+}
+
+#fileInfo.visible {
+  display: block;
+}
+
+#seqStatus {
+  background-color: #0f3460;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  color: #aaa;
+}
+
+#btnRemove {
+  width: 100%;
+  padding: 12px;
+  background-color: #e94560;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-bottom: 4px;
+  transition: all 0.2s;
+}
+
+#btnRemove:hover:not(:disabled) {
+  background-color: #c73652;
+}
+
+#btnRemove:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+#btnClose {
+  width: 100%;
+  padding: 12px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s;
+}
+
+#btnClose:hover:not(:disabled) {
+  background-color: #1e7e34;
+}
+
+#btnClose:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.hint {
+  color: #666;
+  font-size: 11px;
+  text-align: center;
+  margin-top: 3px;
+  margin-bottom: 8px;
+}
+
+.log-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+#btnClearLog {
+  background-color: transparent;
+  border: 1px solid #333;
+  color: #666;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 11px;
+}
+
+#btnClearLog:hover {
+  border-color: #e94560;
+  color: #e94560;
+}
+
+#logArea {
+  background-color: #0d0d1a;
+  border-radius: 8px;
+  padding: 10px;
+  min-height: 60px;
+  max-height: 130px;
+  overflow-y: auto;
+  font-size: 11px;
+  color: #888;
+  font-family: monospace;
+  white-space: pre-wrap;
+  border: 1px solid #0f3460;
+}
