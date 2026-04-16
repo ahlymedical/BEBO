@@ -1,0 +1,112 @@
+/* Base styles and overrides */
+:root {
+    --toast-bg-success: #10b981;
+    --toast-bg-error: #ef4444;
+    --toast-bg-warning: #f59e0b;
+}
+
+body {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide scrollbar for cleaner look but allow scrolling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #4b5563;
+}
+
+/* View transition logic */
+.view-section {
+    display: none;
+    animation: fadeIn 0.3s ease-in-out;
+}
+.view-section.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Navigation active state styling overrides */
+.nav-btn.active {
+    background-color: #eff6ff; /* blue-50 */
+    color: #2563eb; /* blue-600 */
+    font-weight: 600;
+}
+.dark .nav-btn.active {
+    background-color: rgba(59, 130, 246, 0.2);
+    color: #60a5fa; /* blue-400 */
+}
+
+/* Toast Animations */
+.toast {
+    transform: translateX(120%);
+    transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease;
+    opacity: 0;
+}
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+/* HTML5 QRCode specific overrides */
+#reader {
+    width: 100%;
+}
+#reader button {
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    margin: 5px;
+    transition: background-color 0.2s;
+}
+#reader button:hover {
+    background-color: #2563eb;
+}
+.dark #reader button {
+    background-color: #2563eb;
+}
+.dark #reader button:hover {
+    background-color: #1d4ed8;
+}
+#reader select {
+    padding: 6px;
+    border-radius: 4px;
+    border: 1px solid #d1d5db;
+    margin-bottom: 10px;
+    background-color: white;
+    color: #111827;
+}
+.dark #reader select {
+    background-color: #374151;
+    border-color: #4b5563;
+    color: white;
+}
+#reader__dashboard_section_csr span {
+    color: inherit;
+}
+#reader a {
+    color: #3b82f6;
+}
+
+/* Modal Animation Helper classes */
+.modal-open #addItemModalContent {
+    transform: scale(1);
+    opacity: 1;
+}
