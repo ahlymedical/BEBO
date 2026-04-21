@@ -114,6 +114,15 @@ function updateThemeUI(isDark) {
 }
 
 // Toast Notifications
+function escapeHTML(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
+
 function showToast(message, type = 'success') {
     const container = document.getElementById('toastContainer');
     const toast = document.createElement('div');
@@ -131,7 +140,7 @@ function showToast(message, type = 'success') {
     }
 
     toast.className = `${bgClass} text-white px-4 py-3 rounded-lg shadow-lg flex items-center gap-3 toast`;
-    toast.innerHTML = `<i class="fa-solid ${iconClass}"></i> <span>${message}</span>`;
+    toast.innerHTML = `<i class="fa-solid ${iconClass}"></i> <span>${escapeHTML(message)}</span>`;
 
     container.appendChild(toast);
 
@@ -224,13 +233,13 @@ function renderInventory() {
         tr.className = `border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50 ${isLowStock ? 'bg-red-50 dark:bg-red-900/10' : ''}`;
 
         tr.innerHTML = `
-            <td class="py-3 px-4 font-medium">${item.name}</td>
-            <td class="py-3 px-4 font-mono text-sm">${item.barcode}</td>
+            <td class="py-3 px-4 font-medium">${escapeHTML(item.name)}</td>
+            <td class="py-3 px-4 font-mono text-sm">${escapeHTML(item.barcode)}</td>
             <td class="py-3 px-4 font-bold ${isLowStock ? 'text-red-500' : ''}">${item.stock}</td>
             <td class="py-3 px-4">${item.minAlert}</td>
             <td class="py-3 px-4 text-center">${statusBadge}</td>
             <td class="py-3 px-4 text-center">
-                <button onclick="deleteItem('${item.barcode}')" class="text-red-500 hover:text-red-700 transition-colors" title="Delete Item">
+                <button onclick="deleteItem('${escapeHTML(item.barcode)}')" class="text-red-500 hover:text-red-700 transition-colors" title="Delete Item">
                     <i class="fa-solid fa-trash"></i>
                 </button>
             </td>
@@ -379,8 +388,8 @@ function updateDashboard() {
         const tr = document.createElement('tr');
         tr.className = "border-b border-gray-200 dark:border-gray-700 bg-red-50 dark:bg-red-900/10";
         tr.innerHTML = `
-            <td class="py-3 px-4 font-medium">${item.name}</td>
-            <td class="py-3 px-4 font-mono text-sm">${item.barcode}</td>
+            <td class="py-3 px-4 font-medium">${escapeHTML(item.name)}</td>
+            <td class="py-3 px-4 font-mono text-sm">${escapeHTML(item.barcode)}</td>
             <td class="py-3 px-4 font-bold text-red-500">${item.stock}</td>
             <td class="py-3 px-4">${item.minAlert}</td>
         `;
@@ -411,9 +420,9 @@ function renderReports() {
         const tr = document.createElement('tr');
         tr.className = "border-b border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800/50";
         tr.innerHTML = `
-            <td class="py-3 px-4 text-sm text-gray-500 dark:text-gray-400">${dateString}</td>
-            <td class="py-3 px-4 font-mono text-sm">${tx.itemId}</td>
-            <td class="py-3 px-4 font-medium">${tx.itemName}</td>
+            <td class="py-3 px-4 text-sm text-gray-500 dark:text-gray-400">${escapeHTML(dateString)}</td>
+            <td class="py-3 px-4 font-mono text-sm">${escapeHTML(tx.itemId)}</td>
+            <td class="py-3 px-4 font-medium">${escapeHTML(tx.itemName)}</td>
             <td class="py-3 px-4 text-center">${actionBadge}</td>
             <td class="py-3 px-4 text-center font-bold ${qtyColor}">${qtyPrefix}${tx.quantity}</td>
         `;
