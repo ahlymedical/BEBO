@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse & Inventory Management System</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        darkBg: '#111827',
+                        darkPanel: '#1f2937'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-100 text-gray-800 dark:bg-darkBg dark:text-gray-100 font-sans transition-colors duration-300">
+
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="w-64 bg-white dark:bg-darkPanel border-r border-gray-200 dark:border-gray-700 flex flex-col transition-transform transform -translate-x-full md:translate-x-0 fixed md:relative z-20 h-full">
+            <div class="p-5 flex items-center justify-between border-b border-gray-200 dark:border-gray-700">
+                <h1 class="text-xl font-bold text-primary flex items-center gap-2">
+                    <i class="fa-solid fa-boxes-stacked"></i> WIMS
+                </h1>
+                <button id="closeSidebarBtn" class="md:hidden text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white">
+                    <i class="fa-solid fa-xmark fa-lg"></i>
+                </button>
+            </div>
+
+            <nav class="flex-1 p-4 space-y-2 overflow-y-auto">
+                <button onclick="navigate('dashboard')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 active" data-target="dashboard">
+                    <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+                </button>
+                <button onclick="navigate('inventory')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700" data-target="inventory">
+                    <i class="fa-solid fa-box-open w-5"></i> Inventory
+                </button>
+                <button onclick="navigate('scanner')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700" data-target="scanner">
+                    <i class="fa-solid fa-barcode w-5"></i> Scanner
+                </button>
+                <button onclick="navigate('reports')" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700" data-target="reports">
+                    <i class="fa-solid fa-file-invoice w-5"></i> Reports
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-gray-200 dark:border-gray-700">
+                <button id="themeToggleBtn" class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors">
+                    <i id="themeIcon" class="fa-solid fa-moon"></i>
+                    <span id="themeText">Dark Mode</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Overlay for mobile sidebar -->
+        <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-10 hidden md:hidden"></div>
+
+        <!-- Main Content Area -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+
+            <!-- Mobile Header -->
+            <header class="md:hidden bg-white dark:bg-darkPanel p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between z-10">
+                <div class="flex items-center gap-3">
+                    <button id="openSidebarBtn" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
+                        <i class="fa-solid fa-bars fa-lg"></i>
+                    </button>
+                    <h1 class="text-xl font-bold text-primary">WIMS</h1>
+                </div>
+            </header>
+
+            <!-- Scrollable Views Container -->
+            <div class="flex-1 overflow-y-auto p-4 md:p-8 relative">
+
+                <!-- View: Dashboard -->
+                <section id="view-dashboard" class="view-section active">
+                    <h2 class="text-2xl font-bold mb-6">Dashboard Summary</h2>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-white dark:bg-darkPanel p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-4">
+                            <div class="p-3 bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 rounded-lg">
+                                <i class="fa-solid fa-cubes fa-2x"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Total Unique Items</p>
+                                <p id="dashTotalUnique" class="text-2xl font-bold">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-darkPanel p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-4">
+                            <div class="p-3 bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400 rounded-lg">
+                                <i class="fa-solid fa-boxes-packing fa-2x"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Total Stock Volume</p>
+                                <p id="dashTotalVolume" class="text-2xl font-bold">0</p>
+                            </div>
+                        </div>
+                        <div class="bg-white dark:bg-darkPanel p-6 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 flex items-center gap-4">
+                            <div class="p-3 bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400 rounded-lg">
+                                <i class="fa-solid fa-triangle-exclamation fa-2x"></i>
+                            </div>
+                            <div>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Low Stock Items</p>
+                                <p id="dashLowStock" class="text-2xl font-bold text-red-500">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-darkPanel rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                        <h3 class="text-xl font-semibold mb-4 text-red-500 dark:text-red-400 flex items-center gap-2">
+                            <i class="fa-solid fa-circle-exclamation"></i> Action Required: Low Stock
+                        </h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm uppercase">
+                                        <th class="py-3 px-4">Item Name</th>
+                                        <th class="py-3 px-4">Barcode ID</th>
+                                        <th class="py-3 px-4">Current Stock</th>
+                                        <th class="py-3 px-4">Alert Threshold</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="dashboardLowStockTable">
+                                    <!-- Low stock items will be injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- View: Inventory -->
+                <section id="view-inventory" class="view-section hidden">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                        <h2 class="text-2xl font-bold">Inventory Management</h2>
+                        <button onclick="toggleAddItemModal()" class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2">
+                            <i class="fa-solid fa-plus"></i> Register New Item
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-darkPanel rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm uppercase bg-gray-50 dark:bg-gray-800">
+                                        <th class="py-3 px-4">Item Name</th>
+                                        <th class="py-3 px-4">Barcode ID</th>
+                                        <th class="py-3 px-4">Stock</th>
+                                        <th class="py-3 px-4">Min Alert</th>
+                                        <th class="py-3 px-4 text-center">Status</th>
+                                        <th class="py-3 px-4 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inventoryTableBody">
+                                    <!-- Inventory items will be injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- View: Scanner -->
+                <section id="view-scanner" class="view-section hidden flex flex-col items-center">
+                    <h2 class="text-2xl font-bold mb-6 w-full text-left">Smart Scanner</h2>
+
+                    <div class="bg-white dark:bg-darkPanel rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 w-full max-w-2xl p-6 mb-6">
+
+                        <!-- Scanner Mode Selection -->
+                        <div class="flex justify-center mb-6 gap-4">
+                            <button id="modeInBtn" onclick="setScannerMode('in')" class="flex-1 py-3 rounded-lg font-semibold border-2 border-green-500 bg-green-500 text-white transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-arrow-turn-down"></i> Receive (IN)
+                            </button>
+                            <button id="modeOutBtn" onclick="setScannerMode('out')" class="flex-1 py-3 rounded-lg font-semibold border-2 border-gray-300 dark:border-gray-600 text-gray-500 dark:text-gray-400 hover:border-red-500 hover:text-red-500 transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-arrow-turn-up"></i> Issue (OUT)
+                            </button>
+                        </div>
+
+                        <div class="text-center mb-4 text-sm font-medium">
+                            Current Mode: <span id="currentModeLabel" class="text-green-500 uppercase">Receive (IN) - Stock will increase</span>
+                        </div>
+
+                        <!-- Scanner Viewport -->
+                        <div id="reader" class="w-full mx-auto overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800 border-2 border-dashed border-gray-300 dark:border-gray-600" style="min-height: 300px;"></div>
+
+                        <!-- Manual Entry Fallback -->
+                        <div class="mt-6 border-t border-gray-200 dark:border-gray-700 pt-4">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-2">Can't scan? Enter barcode manually:</p>
+                            <form id="manualScanForm" class="flex gap-2">
+                                <input type="text" id="manualBarcode" placeholder="Enter Barcode ID" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                                <button type="submit" class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- View: Reports -->
+                <section id="view-reports" class="view-section hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Transaction History</h2>
+                        <button onclick="clearHistory()" class="text-red-500 hover:text-red-700 text-sm font-medium flex items-center gap-1">
+                            <i class="fa-solid fa-trash-can"></i> Clear History
+                        </button>
+                    </div>
+
+                    <div class="bg-white dark:bg-darkPanel rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 p-6">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="border-b border-gray-200 dark:border-gray-700 text-gray-500 dark:text-gray-400 text-sm uppercase bg-gray-50 dark:bg-gray-800">
+                                        <th class="py-3 px-4">Timestamp</th>
+                                        <th class="py-3 px-4">Item ID</th>
+                                        <th class="py-3 px-4">Item Name</th>
+                                        <th class="py-3 px-4 text-center">Action</th>
+                                        <th class="py-3 px-4 text-center">Qty Changed</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reportsTableBody">
+                                    <!-- Transaction logs will be injected here -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Modal: Add Item -->
+    <div id="addItemModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-darkPanel rounded-xl shadow-lg w-full max-w-md overflow-hidden transform scale-95 opacity-0 transition-all duration-300" id="addItemModalContent">
+            <div class="p-5 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                <h3 class="text-xl font-bold">Register New Item</h3>
+                <button onclick="toggleAddItemModal()" class="text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:hover:text-white">
+                    <i class="fa-solid fa-xmark fa-lg"></i>
+                </button>
+            </div>
+            <form id="addItemForm" class="p-5 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Item Name</label>
+                    <input type="text" id="itemName" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Barcode / QR Code ID</label>
+                    <input type="text" id="itemBarcode" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Initial Stock</label>
+                        <input type="number" id="itemStock" min="0" value="0" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Min Alert Threshold</label>
+                        <input type="number" id="itemMinAlert" min="0" value="5" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary" required>
+                    </div>
+                </div>
+                <div class="pt-4 flex justify-end gap-3">
+                    <button type="button" onclick="toggleAddItemModal()" class="px-4 py-2 rounded-lg font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">Cancel</button>
+                    <button type="submit" class="bg-primary hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium transition-colors">Save Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-3"></div>
+
+    <!-- html5-qrcode Library -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <!-- Application Logic -->
+    <script src="script.js"></script>
+</body>
+</html>
